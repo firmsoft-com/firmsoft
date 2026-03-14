@@ -16,6 +16,7 @@ import { Repository } from 'typeorm';
 
 import { generateMessageId } from 'src/engine/core-modules/i18n/utils/generateMessageId';
 import { FieldMetadataEntity } from 'src/engine/metadata-modules/field-metadata/field-metadata.entity';
+import { isGeneralObjectActiveByDefault } from 'src/engine/workspace-manager/workspace-sync-metadata/constants/general-objects-active-by-default.config';
 import { ObjectStandardOverridesDTO } from 'src/engine/metadata-modules/object-metadata/dtos/object-standard-overrides.dto';
 import { UpdateObjectPayload } from 'src/engine/metadata-modules/object-metadata/dtos/update-object.input';
 import { ObjectMetadataEntity } from 'src/engine/metadata-modules/object-metadata/object-metadata.entity';
@@ -121,7 +122,7 @@ export class BeforeUpdateOneObject<T extends UpdateObjectPayload>
       ? { ...objectMetadata.standardOverrides }
       : {};
 
-    this.handleActiveField(instance, update);
+    this.handleActiveField(instance, update, objectMetadata);
     this.handleLabelSyncedWithNameField(instance, update);
     this.handleStandardOverrides(instance, objectMetadata, update, locale);
 
@@ -134,9 +135,20 @@ export class BeforeUpdateOneObject<T extends UpdateObjectPayload>
   private handleActiveField(
     instance: UpdateOneInputType<T>,
     update: StandardObjectUpdate,
+    objectMetadata: ObjectMetadataEntity,
   ): void {
     if (!isDefined(instance.update.isActive)) {
       return;
+    }
+
+    if (
+      instance.update.isActive &&
+      !objectMetadata.isSystem &&
+      !isGeneralObjectActiveByDefault(objectMetadata.nameSingular)
+    ) {
+      throw new BadRequestException(
+        'This object cannot be activated.',
+      );
     }
 
     update.isActive = instance.update.isActive;

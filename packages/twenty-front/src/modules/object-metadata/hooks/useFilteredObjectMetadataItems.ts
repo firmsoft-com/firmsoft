@@ -1,7 +1,8 @@
 import { useRecoilValue } from 'recoil';
+import { useMemo } from 'react';
 
 import { objectMetadataItemsState } from '@/object-metadata/states/objectMetadataItemsState';
-import { useMemo } from 'react';
+import { isGeneralObjectActiveByDefault } from '@/settings/data-model/constants/GeneralObjectsActiveByDefault';
 
 export const useFilteredObjectMetadataItems = () => {
   const objectMetadataItems = useRecoilValue(objectMetadataItemsState);
@@ -31,7 +32,10 @@ export const useFilteredObjectMetadataItems = () => {
     });
 
   const inactiveNonSystemObjectMetadataItems = objectMetadataItems.filter(
-    ({ isActive, isSystem }) => !isActive && !isSystem,
+    ({ isActive, isSystem, nameSingular }) =>
+      !isActive &&
+      !isSystem &&
+      isGeneralObjectActiveByDefault(nameSingular),
   );
 
   const findActiveObjectMetadataItemByNamePlural = (namePlural: string) =>

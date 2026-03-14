@@ -1,4 +1,8 @@
-import { BadRequestException, Inject } from '@nestjs/common';
+import {
+  BadRequestException,
+  ForbiddenException,
+  Inject,
+} from '@nestjs/common';
 
 import { Request } from 'express';
 import chunk from 'lodash.chunk';
@@ -120,6 +124,10 @@ export abstract class RestApiBaseHandler {
       throw new BadRequestException(
         `Object metadata item with name singular ${objectMetadataNameSingular} not found`,
       );
+    }
+
+    if (!objectMetadataItemWithFieldsMaps.isActive) {
+      throw new ForbiddenException('This object is not accessible.');
     }
 
     const shouldBypassPermissionChecks = isDefined(apiKey);

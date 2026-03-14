@@ -72,6 +72,10 @@ export const RecordIndexContainerGater = () => {
     return <NotFound />;
   }
 
+  if (!objectMetadataItem.isActive) {
+    return <NotFound />;
+  }
+
   return (
     <>
       <RecordIndexContextProvider

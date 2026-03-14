@@ -29,6 +29,7 @@ import { CompositeFieldMetadataType } from 'src/engine/metadata-modules/workspac
 import { isFieldMetadataEntityOfType } from 'src/engine/utils/is-field-metadata-of-type.util';
 import { FieldMetadataUpdate } from 'src/engine/workspace-manager/workspace-migration-builder/factories/workspace-migration-field.factory';
 import { ObjectMetadataUpdate } from 'src/engine/workspace-manager/workspace-migration-builder/factories/workspace-migration-object.factory';
+import { isGeneralObjectActiveByDefault } from 'src/engine/workspace-manager/workspace-sync-metadata/constants/general-objects-active-by-default.config';
 import { WorkspaceSyncStorage } from 'src/engine/workspace-manager/workspace-sync-metadata/storage/workspace-sync.storage';
 
 @Injectable()
@@ -56,7 +57,10 @@ export class WorkspaceMetadataUpdaterService {
         await objectMetadataRepository.save(
           storage.objectMetadataCreateCollection.map((objectMetadata) => ({
             ...objectMetadata,
-            isActive: true,
+            // System objects stay visible; general objects inactive by default (see general-objects-active-by-default.config)
+            isActive:
+              objectMetadata.isSystem ||
+              isGeneralObjectActiveByDefault(objectMetadata.nameSingular),
           })) as DeepPartial<ObjectMetadataEntity>[],
         );
       const identifiers = createdPartialObjectMetadataCollection.map(

@@ -32,7 +32,6 @@
       "dependsOn": ["^build"]
     },
     "start": {
-      "cache": true,
       "dependsOn": ["^build"]
     },
     "lint": {

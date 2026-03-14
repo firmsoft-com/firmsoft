@@ -1,4 +1,8 @@
-import { Inject, Injectable } from '@nestjs/common';
+import {
+  ForbiddenException,
+  Inject,
+  Injectable,
+} from '@nestjs/common';
 
 import graphqlFields from 'graphql-fields';
 import { PermissionsOnAllObjectRecords } from 'twenty-shared/constants';
@@ -99,6 +103,10 @@ export abstract class GraphqlQueryBaseResolverService<
 
       if (objectMetadataItemWithFieldMaps.isSystem === true) {
         await this.validateSettingsPermissionsOnObjectOrThrow(options);
+      }
+
+      if (!objectMetadataItemWithFieldMaps.isActive) {
+        throw new ForbiddenException('This object is not accessible.');
       }
 
       const hookedArgs =

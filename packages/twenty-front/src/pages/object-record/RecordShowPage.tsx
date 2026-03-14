@@ -15,6 +15,7 @@ import { RecordSortsComponentInstanceContext } from '@/object-record/record-sort
 import { PageHeaderToggleCommandMenuButton } from '@/ui/layout/page-header/components/PageHeaderToggleCommandMenuButton';
 import { PageBody } from '@/ui/layout/page/components/PageBody';
 import { PageContainer } from '@/ui/layout/page/components/PageContainer';
+import { NotFound } from '~/pages/not-found/NotFound';
 import { RecordShowPageHeader } from '~/pages/object-record/RecordShowPageHeader';
 import { RecordShowPageTitle } from '~/pages/object-record/RecordShowPageTitle';
 
@@ -24,10 +25,15 @@ export const RecordShowPage = () => {
     objectRecordId: string;
   }>();
 
-  const { objectNameSingular, objectRecordId } = useRecordShowPage(
-    parameters.objectNameSingular ?? '',
-    parameters.objectRecordId ?? '',
-  );
+  const { objectNameSingular, objectRecordId, objectMetadataItem } =
+    useRecordShowPage(
+      parameters.objectNameSingular ?? '',
+      parameters.objectRecordId ?? '',
+    );
+
+  if (objectMetadataItem && !objectMetadataItem.isActive) {
+    return <NotFound />;
+  }
 
   const recordShowComponentInstanceId =
     computeRecordShowComponentInstanceId(objectRecordId);
